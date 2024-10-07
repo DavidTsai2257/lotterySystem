@@ -1,0 +1,203 @@
+﻿@{
+    ViewBag.Title = "首頁";
+}
+<div id="loading" style="display:none; justify-content: center; align-items: center;">
+    <img id="loading-image" src="../images/489377391.gif" alt="Loading..." loading="lazy" />
+</div>
+<div style="text-align:center;">
+    <h2>年終尾牙抽獎系統</h2>
+</div>
+
+<div id="preloader">
+    <table align="center" style="border:3px #ffffff solid;" cellpadding="10" border='1'>
+        <tr>
+            <td>獎項類別</td>
+            <td>
+                <div>@Html.DropDownList("CategoryOption", (IEnumerable<SelectListItem>)Session["CategoryOption"])</div>
+            </td>
+            <td>獎項名稱</td>
+            <td>
+                <div>@Html.DropDownList("PrizeOption", (IEnumerable<SelectListItem>)Session["PrizeOption"])</div>
+            </td>
+        </tr>
+        <tr>
+            <td>中獎人數</td>
+            <td>
+                <select id="PeopleNumber">
+                    <option value="0" selected>請選擇</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </td>
+            <td>是否可重複抽獎</td>
+            <td>
+                <select id="YN">
+                    <option value="0" selected>否</option>
+                    <option value="1">可</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div style="text-align:center;">
+        <button id="Lotterybutton">抽獎</button>
+    </div>
+    <div style="text-align:center;">
+        <textarea id="AwardsList" style="font-size: 15px; color: black; width: 75%; height: 250px; resize: none;" disabled></textarea>
+    </div>
+</div>
+
+@section style {
+    <style type="text/css">
+        h2 {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+        table {
+            width: 500px;
+            height: 50px;
+            border: 1px solid #ffffff;
+            margin: auto;
+        }
+
+            table td {
+                vertical-align: middle;
+                text-align: center;
+                color: black;
+                font-weight: bold;
+            }
+
+/*        .content {
+            width: 400px;
+            background: #ffffff;
+            display: inline-block;
+            text-align: left;
+        }*/
+
+        .button {
+            background-color: #f22f2f;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        #loading {
+            position: fixed;
+            display: block;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            text-align: center;
+            opacity: 0.7;
+            background-color: #fff;
+            z-index: 99;
+        }
+
+        #loading-image {
+            position: absolute;
+            top: 100px;
+            left: 500px;
+            z-index: 100;
+        }
+    </style>
+}
+
+@section scripts {
+    <script type="text/javascript">
+        $("#CategoryOption").bind("change", function () {
+            var Category = $(this).val();
+            $.ajax({
+                type: "Get",
+                url: "/Home/GetPrizeList",
+                dataType: "json",
+                data: {
+                    Category: Category
+                },
+                error: function (result) {
+                    console.log("GET DATA FAIL");
+                    alert("讀取獎項下拉式失敗");
+                },
+                success: function (result) {
+                    $('#PrizeOption').html('');
+                    for (var i = 0; i < result.length; i++) {
+                        $('#PrizeOption').append('<option value=' + result[i].Value + '>' + result[i].Text + '</option>')
+                    }
+                }
+            })
+        })
+        $("#Lotterybutton").click(function () {
+            var flag = true;
+            var alterMsg = "";
+            var Category = $('#CategoryOption').val();
+            var Prize = $('#PrizeOption').val();
+            var PeopleNumber = $('#PeopleNumber').val();
+            var YN = $('#YN').val();
+            if (Category == 0) {
+                flag = false;
+                alterMsg += "請選擇獎品類型\r\n";
+            }
+            if (Prize == 0) {
+                flag = false;
+                alterMsg += "請選擇獎品\r\n";
+            }
+            if (PeopleNumber == 0) {
+                flag = false;
+                alterMsg += "請選擇中獎人數\r\n";
+            }
+            if (flag) {
+                $.ajax({
+                    url: '/Home/LotteryMethod',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        Category: Category,
+                        Prize: Prize,
+                        PeopleNumber: PeopleNumber,
+                        YN: YN
+                    },
+                    error: function (data) {
+                        console.log("GET DATA FAIL");
+                        alert("資料寫入失敗");
+                    },
+                    success: function (data) {  
+                        if (data.result == "fail") {
+                            console.log("log:" + data.msg);
+                            alert(data.msg);
+                            return false;
+                        }
+                        else {
+                            document.getElementById("loading").style.display = ""
+                            setTimeout(
+                                function () {
+                                    //do something special
+                                    document.getElementById("loading").style.display = "none";
+                                    $('#AwardsList').val(data.msg);
+                                }, 3000);
+                        }
+                    }
+                })
+            }
+            else {
+                alert(alterMsg);
+                return false;
+            }
+        });
+        function hideLoader() {
+            $('#loading').hide();
+        }
+    </script>
+    }

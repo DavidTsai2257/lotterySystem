@@ -1,0 +1,84 @@
+﻿@using lotterySystem.Enums
+@using lotterySystem.Models
+@{
+    ViewBag.Title = "同仁名單";
+    var StaffList = ViewBag.StaffList;
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://kit.fontawesome.com/050bfadd70.js" crossorigin="anonymous"></script>
+<link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+<div style="text-align:center;">
+    <h2>同仁名單</h2>
+</div>
+<div id="dataContent" style="padding-top:20px;border-top:2px solid #000000;margin-top:20px;">
+    <div>
+        <input style="height:40px" type="file" id="uploadBtn" />
+        <button id="btnSave" type="button">匯入</button>
+    </div>
+    <div id="dataContent" style="padding-top:20px;border-top:2px solid #000000;margin-top:20px;">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-color">
+                <tr class="danger">
+                    <th scope="col"><strong>單位(處)</strong></th>
+                    <th scope="col"><strong>單位(科)</strong></th>
+                    <th scope="col"><strong>工號</strong></th>
+                    <th scope="col"><strong>姓名</strong></th>
+                    <th scope="col"><strong>獎項</strong></th>
+                </tr>
+            </thead>
+            <tbody id="searchData">
+                @foreach (var item in StaffList)
+                {
+                    <tr class="info">
+                        <td>@item.Office</td>
+                        <td>@item.Section</td>
+                        <td>@item.StaffNumber</td>
+                        <td>@item.StaffName</td>
+                        <td>@item.Awards</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@section style {
+    <style type="text/css">
+        h2 {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        $("#btnSave").click(function () {
+            if (window.FormData !== undefined) {
+                var fileUpload = $("#uploadBtn").get(0);
+                var files = fileUpload.files;
+                var fileData = new FormData();
+                // 取得上傳的檔案
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+                // 將檔案POST至後端
+                $.ajax({
+                    url: '/Staff/Import',
+                    type: "POST",
+                    contentType: false, // Not to set any content header
+                    processData: false, // Not to process data
+                    data: fileData,
+                    success: function (result) {
+                        alert(result);
+                        history.go(0)
+                    },
+                    error: function (err) {
+                        alert(err.statusText);
+                    }
+                });
+            } else {
+                alert("FormData is not supported.");
+            }
+        });
+    </script>
+}

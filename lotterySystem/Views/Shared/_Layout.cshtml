@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>年終尾牙抽獎系統</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("style", required: false)
+    <link rel="stylesheet" href="~/Content/Site.css" asp-append-version="true" />
+
+</head>
+<body>
+    <div class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("年終尾牙抽獎系統", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("獎項清單", "Index", "Prize")</li>
+                    <li>@Html.ActionLink("同仁清單", "Index", "Staff")</li>
+                    <li>@Html.ActionLink("中獎清單", "Index", "Awarded")</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        @RenderBody()
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+
+@section style {
+    <style type="text/css">
+        html {
+            min-height: 100%;
+            position: relative;
+        }
+
+        body {
+            /* Margin bottom by footer height */
+            margin-bottom: 80px;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+        }
+    </style>
+}

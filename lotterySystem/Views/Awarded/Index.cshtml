@@ -1,0 +1,123 @@
+﻿@using lotterySystem.Enums
+@using lotterySystem.Models
+@{
+    ViewBag.Title = "獲獎名單";
+    var AwardedList = ViewBag.AwardedList;
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://kit.fontawesome.com/050bfadd70.js" crossorigin="anonymous"></script>
+<link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+<div style="text-align:center;">
+    <h2>得獎名單</h2>
+</div>
+<div id="dataContent" style="padding-top:20px;border-top:2px solid #000000;margin-top:20px;">
+    <a id="ExportButton"><i class="fas fa-file-export">匯出</i></a>
+    <a id="ClearButton"><i class="fas fa-trash" onclick="return confirm('確定全部刪除?')">全部移除</i></a>
+    <table class="table table-striped table-bordered">
+        <thead class="thead-color">
+            <tr class="danger">
+                <th scope="col"><strong>獎項類別</strong></th>
+                <th scope="col"><strong>獎項名稱</strong></th>
+                <th scope="col"><strong>得獎人單位(處)</strong></th>
+                <th scope="col"><strong>得獎人單位(科)</strong></th>
+                <th scope="col"><strong>得獎人工號</strong></th>
+                <th scope="col"><strong>得獎人姓名</strong></th>
+                <th scope="col"><strong>編輯</strong></th>
+            </tr>
+        </thead>
+        <tbody id="searchData">
+            @foreach (var item in AwardedList)
+            {
+                <tr class="info">
+                    <td>@GetTransfer.GetDescription((CategoryEnum)item.Category)</td>
+                    <td>@item.Awards</td>
+                    <td>@item.Office</td>
+                    <td>@item.Section</td>
+                    <td>@item.StaffNumber</td>
+                    <td>@item.StaffName</td>
+                    <td>
+                        <a href="../Awarded/Awarded_Delete?id=@item.ID"><i class="fas fa-trash" onclick="return confirm('確定刪除?')"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section style {
+    <style type="text/css">
+        h2 {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+}
+@section scripts {
+    <script type="text/javascript">
+        $('#ClearButton').click(function () {
+            $('#ClearButton').removeAttr("disabled");
+            Clear();
+        });
+        function Clear() {
+            $.ajax({
+                url: '/Awarded/Awarded_Clear',
+                type: "POST",
+                dataType: "json",
+                error: function (data) {
+                    console.log("GET DATA FAIL");
+                    alert("移除清單失敗");
+                },
+                success: function (data) {
+                    if (data.result == "fail") {
+                        console.log("log:" + data.msg);
+                        alert(data.msg);
+                        return false;
+                    }
+                    else {
+                        alert("清除成功");
+                        history.go(0);
+                    }
+                }
+            })
+        }
+        $('#DeleteButton').click(function () {
+            $('#DeleteButton').removeAttr("disabled");
+            Delete();
+        });
+        function Delete() {
+            var rowData = $(this).parent().parent().find("td");
+            var id = rowData.eq(0).text()
+            console.log("ID:" + id)
+            $.ajax({
+                url: '/Awarded/Awarded_Delete',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    ID: id
+                },
+                error: function (data) {
+                    console.log("GET DATA FAIL");
+                    alert("刪除資料失敗");
+                },
+                success: function (data) {
+                    if (data.result == "fail") {
+                        console.log("log:" + data.msg);
+                        alert(data.msg);
+                        return false;
+                    }
+                    else {
+                        alert("清除成功");
+                        history.go(0);
+                    }
+                }
+            })
+        }
+        $('#ExportButton').click(function () {
+            $('#ExportButton').removeAttr("disabled");
+            Export();
+        });
+        function Export() {
+            window.location = "/Awarded/AwardedList_Export"
+        }
+    </script>
+}

@@ -1,0 +1,16 @@
+﻿            html {
+            height: 100%;
+        }    
+		body {
+            background-image: url("../images/test111.jpg");
+			background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+			/* 透明度 0.6 的半透明遮罩*/
+			background-color: rgb(232 234 215 / 60%);
+			/*設置背景混和模式為相乘模式*/
+			background-blend-mode: multiply;
+        }
+/* Set width on the form input elements since they're 100% wide by default */
+
